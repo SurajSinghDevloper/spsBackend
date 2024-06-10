@@ -46,11 +46,20 @@ public class Staff {
 	 @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
 	private List<StaffArea> area;
 	private String aadharNo;
+	private String addharFrontDoc;
+	private String addharBackDoc;
 	private String panCard;
+	private String panFrontDoc;
+	private String panBackDoc;
 	private String bankDoc;
+	private String accountNumber;
+	private String bankName;
+	private String branch;
+	private String ifscCode;
 	private String exEmp;
 	private String idCopy;
 	private String declaration;
+	private String bloodGroup;
 	private Date filledDate;
 	@Enumerated(EnumType.STRING)
 	private Status active;
@@ -59,6 +68,12 @@ public class Staff {
 	@Enumerated(EnumType.STRING)
 	private Status idStatus;
 	private String characterDoc;
+	@Enumerated(EnumType.STRING)
+	private Status isOfferGenrated;
+	@Enumerated(EnumType.STRING)
+	private Status isIdGenrated;
+	private Long approvBy;
+	private String empNo;
 	private String place;
 	private Long filledBy;
 	private Timestamp stamp;

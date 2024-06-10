@@ -23,6 +23,7 @@ import com.sps.management.repositories.QualificationRepository;
 import com.sps.management.repositories.StaffAreaRepository;
 import com.sps.management.repositories.StaffRepository;
 import com.sps.management.services.StaffServices;
+import com.sps.management.utils.EmpIdGenerator;
 import com.sps.management.utils.ImageToLocalStorage;
 
 @Service
@@ -36,6 +37,8 @@ public class StaffServicesImpl implements StaffServices {
 	private StaffAreaRepository areaRepo;
 	@Autowired
 	private ImageToLocalStorage fileService;
+	@Autowired
+	private EmpIdGenerator idGenerator;
 
 	@Override
 	public String saveStaffDetails(Actions action, Long staffId, NewStaffDTO newStaff) {
@@ -93,7 +96,7 @@ public class StaffServicesImpl implements StaffServices {
 			return Result.ALLREADY_EXISTS.toString();
 		}
 
-		Staff staff = createOrUpdateStaff(new Staff(), newStaff);
+		Staff staff = createOrUpdateStaff(new Staff(), newStaff,"NEW");
 		saveOrUpdateQualifications(staff, newStaff.getQuali());
 		List <StaffAreaDTO> dto = new ArrayList<>();
 		dto.add( newStaff.getArea());
@@ -108,13 +111,13 @@ public class StaffServicesImpl implements StaffServices {
 		}
 
 		Staff existingStaff = optionalStaff.get();
-		existingStaff = createOrUpdateStaff(existingStaff, newStaff);
+		existingStaff = createOrUpdateStaff(existingStaff, newStaff,"EDIT");
 		saveOrUpdateQualifications(existingStaff, newStaff.getQuali());
 
 		return saveStaff(existingStaff);
 	}
 
-	private Staff createOrUpdateStaff(Staff staff, NewStaffDTO newStaff) {
+	private Staff createOrUpdateStaff(Staff staff, NewStaffDTO newStaff,String action) {
 		staff.setPostOf(newStaff.getPostOf());
 		staff.setName(newStaff.getName());
 		staff.setFname(newStaff.getFname());
@@ -126,14 +129,8 @@ public class StaffServicesImpl implements StaffServices {
 		staff.setPaddress(newStaff.getPaddress());
 		staff.setCaddress(newStaff.getCaddress());
 		staff.setEmail(newStaff.getEmail());
-		boolean hasImage = newStaff.getStaffImg() != null;
-		staff.setStaffImg(hasImage?fileService.saveImage(newStaff.getStaffImg(), newStaff.getName()):"N/A");
 		staff.setAadharNo(newStaff.getAadharNo());
 		staff.setPanCard(newStaff.getPanCard());
-		boolean hasImg = newStaff.getBankDoc() != null;
-		staff.setBankDoc(hasImg?fileService.saveImage(newStaff.getBankDoc(), newStaff.getName() + "BANK"):"N/A");
-		boolean hasCharacter = newStaff.getCharacterDoc() != null;
-		staff.setCharacterDoc(hasCharacter?fileService.saveImage(newStaff.getCharacterDoc(), newStaff.getName() + "CHARACTER"):"N/A");
 		staff.setExEmp(newStaff.getExEmp());
 		staff.setIdCopy(newStaff.getIdCopy());
 		staff.setDeclaration(newStaff.getDeclaration());
@@ -142,10 +139,42 @@ public class StaffServicesImpl implements StaffServices {
 		staff.setFilledDate(now);
 		staff.setPlace(newStaff.getPlace());
 		staff.setFilledBy(newStaff.getFilledBy());
-		staff.setStamp(new Timestamp(timeInMillis));
+		staff.setBloodGroup(newStaff.getBloodGroup());
+		staff.setAccountNumber(newStaff.getAccountNumber());
+		staff.setBankName(newStaff.getBankName());
+		staff.setBranch(newStaff.getBranch());
+		staff.setIfscCode(newStaff.getIfscCode());
+		staff.setApprovBy(Long.parseLong(newStaff.getApprovBy()));
+		if(action=="EDIT") {
+			staff.setIsOfferGenrated(newStaff.getIsOfferGenrated());
+			staff.setIsIdGenrated(newStaff.getIsIdGenrated());
+			staff.setVerified(newStaff.getVerified());
+			staff.setIdStatus(newStaff.getIdStatus());
+		}
+		if(action!="EDIT") {
+			staff.setIsOfferGenrated(Status.FALSE);
+			staff.setIsIdGenrated(Status.FALSE);
+			staff.setVerified(Status.UNVERIFIED);
+			staff.setIdStatus(Status.INACTIVE);
+			staff.setEmpNo(idGenerator.getEmpId());
+			
+		}
 		staff.setActive(Status.ACTIVE);
-		staff.setVerified(Status.UNVERIFIED);
-		staff.setIdStatus(Status.INACTIVE);
+		staff.setStamp(new Timestamp(timeInMillis));
+		boolean hasImage = newStaff.getStaffImg() != null;
+		staff.setStaffImg(hasImage?fileService.saveImage(newStaff.getStaffImg(), newStaff.getName()):newStaff.getStaffImgName());
+		boolean hasImg = newStaff.getBankDoc() != null;
+		staff.setBankDoc(hasImg?fileService.saveImage(newStaff.getBankDoc(), newStaff.getName() + "BANK"):newStaff.getBankDocName());
+		boolean hasCharacter = newStaff.getCharacterDoc() != null;
+		staff.setCharacterDoc(hasCharacter?fileService.saveImage(newStaff.getCharacterDoc(), newStaff.getName() + "CHARACTER"):newStaff.getCharacterDocName());
+		boolean hasPanFront=newStaff.getPanFrontDoc()!=null;
+		staff.setPanFrontDoc(hasPanFront?fileService.saveImage(newStaff.getPanFrontDoc(), newStaff.getName() + "PAN_FRONT"):newStaff.getPanBackDocName());
+		boolean hasPanBack=newStaff.getPanBackDoc()!=null;
+		staff.setPanBackDoc(hasPanBack?fileService.saveImage(newStaff.getPanBackDoc(),  newStaff.getName() + "PAN_BACK"):newStaff.getPanBackDocName());
+		boolean hasAdharFront=newStaff.getAddharFrontDoc()!=null;
+		staff.setAddharFrontDoc(hasAdharFront?fileService.saveImage(newStaff.getAddharFrontDoc(),  newStaff.getName() + "AADHAR_FRONT"):newStaff.getAddharFrontDocName());
+		boolean hasAdharBack=newStaff.getAddharBackDoc()!=null;
+		staff.setAddharBackDoc(hasAdharBack?fileService.saveImage(newStaff.getAddharBackDoc(),  newStaff.getName() + "AADHAR_BACK"):newStaff.getAddharBackDocName());
 
 		return staff;
 	}
@@ -250,6 +279,20 @@ public class StaffServicesImpl implements StaffServices {
 		rsd.setVerified(s.getVerified().toString());
 		rsd.setIdStatus(s.getIdStatus().toString());
 		rsd.setCharacterDoc(s.getCharacterDoc());
+		rsd.setIsOfferGenrated(s.getIsOfferGenrated().toString());
+		rsd.setEmpNo(s.getEmpNo());
+		rsd.setPanFrontDoc(s.getPanFrontDoc());
+		rsd.setPanBackDoc(s.getPanBackDoc());
+		rsd.setAddharFrontDoc(s.getAddharFrontDoc());
+		rsd.setAddharBackDoc(s.getAddharBackDoc());
+		rsd.setBloodGroup(s.getBloodGroup());
+		rsd.setIsIdGenrated(s.getIsIdGenrated().toString());
+		rsd.setAccountNumber(s.getAccountNumber());
+		rsd.setBankName(s.getBankName());
+		rsd.setBranch(s.getBranch());
+		rsd.setIfscCode(s.getIfscCode());
+		rsd.setApprovBy(s.getApprovBy().toString());
+		
 		return rsd;
 	}
 }
