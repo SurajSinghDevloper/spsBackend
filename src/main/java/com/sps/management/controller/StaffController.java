@@ -52,6 +52,12 @@ public class StaffController {
         return ResponseEntity.ok(staffList);
     }
     
+    @GetMapping("/unverified/staff-list")
+    public ResponseEntity<?> getStaffByVerifiedStatus() {
+        List<ResponseStaffDTO> staffList = staffService.staffByVerifiedStatus();
+        return ResponseEntity.ok(staffList);
+    }
+    
     
     public String decoder(String content) {
     	byte[] decodedBytes = Base64.getDecoder().decode(content);

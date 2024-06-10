@@ -38,6 +38,8 @@ public class NewStaffDTO {
 	private String panCard;
 	@Nullable
 	private MultipartFile bankDoc;
+	@Nullable
+	private MultipartFile characterDoc;
 	private String exEmp;
 	private String idCopy;
 	private String declaration;

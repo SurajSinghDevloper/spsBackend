@@ -4,8 +4,12 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
 
+import com.sps.management.constants.Status;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -48,6 +52,13 @@ public class Staff {
 	private String idCopy;
 	private String declaration;
 	private Date filledDate;
+	@Enumerated(EnumType.STRING)
+	private Status active;
+	@Enumerated(EnumType.STRING)
+	private Status verified;
+	@Enumerated(EnumType.STRING)
+	private Status idStatus;
+	private String characterDoc;
 	private String place;
 	private Long filledBy;
 	private Timestamp stamp;

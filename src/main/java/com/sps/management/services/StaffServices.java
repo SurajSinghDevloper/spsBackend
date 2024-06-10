@@ -10,4 +10,5 @@ public interface StaffServices {
 	public String saveStaffDetails(Actions action, Long staffId, NewStaffDTO newStaff);
 	public List<ResponseStaffDTO> allStaffs() ;
 	public ResponseStaffDTO staffByID(Long staffId);
+	public List<ResponseStaffDTO> staffByVerifiedStatus();
 }

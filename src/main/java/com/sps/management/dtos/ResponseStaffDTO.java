@@ -3,6 +3,11 @@ package com.sps.management.dtos;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+
+import com.sps.management.constants.Status;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -38,6 +43,10 @@ public class ResponseStaffDTO {
 	private String declaration;
 	private Date filledDate;
 	private String place;
+	private String active;
+	private String verified;
+	private String idStatus;
+	private String characterDoc;
 	private Long filledBy;
 	private Timestamp stamp;
 }

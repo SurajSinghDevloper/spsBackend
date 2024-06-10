@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.sps.management.constants.Actions;
 import com.sps.management.constants.Result;
+import com.sps.management.constants.Status;
 import com.sps.management.dtos.NewStaffDTO;
 import com.sps.management.dtos.QualificationDTO;
 import com.sps.management.dtos.ResponseStaffDTO;
@@ -47,6 +48,45 @@ public class StaffServicesImpl implements StaffServices {
 			return Result.INVALID_ACTION.toString();
 		}
 	}
+	
+	@Override
+	public List<ResponseStaffDTO> allStaffs() {
+		List<Staff> staff= staffRepo.findAll();
+		List<ResponseStaffDTO> found =new ArrayList<>();
+		for(Staff s:staff) {
+			ResponseStaffDTO rsd = new ResponseStaffDTO();
+			rsd=mapForGet(rsd,s);
+			found.add(rsd);
+			rsd=null;
+		}
+		return found;
+	}
+	
+	@Override
+	public ResponseStaffDTO staffByID(Long staffId) {
+		Staff staff = staffRepo.findById(staffId).get();
+		if(staff!=null) {
+			ResponseStaffDTO rsd = new ResponseStaffDTO();
+			return rsd=mapForGet(rsd,staff);
+		}
+		return null;
+	}
+	
+	@Override
+	public List<ResponseStaffDTO> staffByVerifiedStatus() {
+		List<Staff> staff = staffRepo.findStaffByVerifiedStatus();
+		List<ResponseStaffDTO> found =new ArrayList<>();
+		for(Staff s:staff) {
+			ResponseStaffDTO rsd = new ResponseStaffDTO();
+			rsd=mapForGet(rsd,s);
+			found.add(rsd);
+			rsd=null;
+		}
+		return found;
+	}
+	
+	
+	//supportive methods 
 
 	private String handleNewStaff(NewStaffDTO newStaff) {
 		if (staffRepo.findByEmailOrContactNo(newStaff.getEmail(), newStaff.getContactNo()) != null) {
@@ -92,6 +132,8 @@ public class StaffServicesImpl implements StaffServices {
 		staff.setPanCard(newStaff.getPanCard());
 		boolean hasImg = newStaff.getBankDoc() != null;
 		staff.setBankDoc(hasImg?fileService.saveImage(newStaff.getBankDoc(), newStaff.getName() + "BANK"):"N/A");
+		boolean hasCharacter = newStaff.getCharacterDoc() != null;
+		staff.setCharacterDoc(hasCharacter?fileService.saveImage(newStaff.getCharacterDoc(), newStaff.getName() + "CHARACTER"):"N/A");
 		staff.setExEmp(newStaff.getExEmp());
 		staff.setIdCopy(newStaff.getIdCopy());
 		staff.setDeclaration(newStaff.getDeclaration());
@@ -101,6 +143,9 @@ public class StaffServicesImpl implements StaffServices {
 		staff.setPlace(newStaff.getPlace());
 		staff.setFilledBy(newStaff.getFilledBy());
 		staff.setStamp(new Timestamp(timeInMillis));
+		staff.setActive(Status.ACTIVE);
+		staff.setVerified(Status.UNVERIFIED);
+		staff.setIdStatus(Status.INACTIVE);
 
 		return staff;
 	}
@@ -150,28 +195,7 @@ public class StaffServicesImpl implements StaffServices {
 		return (savedStaff != null) ? Result.SUCCESS.toString() : Result.WENT_WRONG.toString();
 	}
 	
-	@Override
-	public List<ResponseStaffDTO> allStaffs() {
-		List<Staff> staff= staffRepo.findAll();
-		List<ResponseStaffDTO> found =new ArrayList<>();
-		for(Staff s:staff) {
-			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			rsd=mapForGet(rsd,s);
-			found.add(rsd);
-			rsd=null;
-		}
-		return found;
-	}
-	
-	@Override
-	public ResponseStaffDTO staffByID(Long staffId) {
-		Staff staff = staffRepo.findById(staffId).get();
-		if(staff!=null) {
-			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			return rsd=mapForGet(rsd,staff);
-		}
-		return null;
-	}
+
 
 	public ResponseStaffDTO mapForGet(ResponseStaffDTO rsd, Staff s) {
 		rsd.setPostOf(s.getPostOf());
@@ -222,6 +246,10 @@ public class StaffServicesImpl implements StaffServices {
 		}
 		rsd.setArea(sad.get(0));
 		rsd.setQuali(qq);
+		rsd.setActive(s.getActive().toString());
+		rsd.setVerified(s.getVerified().toString());
+		rsd.setIdStatus(s.getIdStatus().toString());
+		rsd.setCharacterDoc(s.getCharacterDoc());
 		return rsd;
 	}
 }
