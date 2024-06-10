@@ -29,6 +29,7 @@ public class ResponseStaffDTO {
 	private String email;
 	private String staffImg;
 	private List<QualificationDTO> quali;
+	private StaffAreaDTO area;
 	private String aadharNo;
 	private String panCard;
 	private String bankDoc;

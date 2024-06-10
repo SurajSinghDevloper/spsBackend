@@ -196,6 +196,32 @@ public class StaffServicesImpl implements StaffServices {
 		rsd.setPlace(s.getPlace());
 		rsd.setFilledBy(s.getFilledBy());
 		rsd.setStamp(s.getStamp());
+		List<Qualification> quali= qualiRepo.findByStaff(s.getStaffId());
+		List<QualificationDTO>qq = new ArrayList<>();
+		for(Qualification d : quali) {
+			QualificationDTO qd = new QualificationDTO();
+			qd.setQualiFication(d.getQualiFication());
+			qd.setYop(d.getYop());
+			qd.setUniv(d.getUniv());
+			qd.setMmarks(d.getMmarks());
+			qd.setOmartks(d.getOmartks());
+			qd.setPercent(d.getPercent());
+			qq.add(qd);
+			qd=null;
+		}
+		List<StaffArea>a = areaRepo.findByStaff(s.getStaffId());
+		List <StaffAreaDTO>sad = new ArrayList<>();
+		for(StaffArea sa:a) {
+			StaffAreaDTO sd = new StaffAreaDTO();
+			sd.setArea(sa.getArea());
+			sd.setCircle(sa.getCircle());
+			sd.setDivision(sa.getDivision());
+			sd.setSubDivision(sa.getSubDivision());
+			sad.add(sd);
+			sd=null;
+		}
+		rsd.setArea(sad.get(0));
+		rsd.setQuali(qq);
 		return rsd;
 	}
 }

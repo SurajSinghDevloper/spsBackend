@@ -1,7 +1,5 @@
 package com.sps.management.dtos;
 
-import com.sps.management.models.Staff;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
