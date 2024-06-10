@@ -1,5 +1,9 @@
 package com.sps.management.models;
 
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,18 +20,15 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Qualification {
+public class StaffArea {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long qid;
-	private String qualiFication;
-	private String yop;
-	private String univ;
-	private Double mmarks;
-	private Double omartks;
-	private Double percent;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long areaId;
+	private String area;
+	private String circle;
+	private String division;
+	private String subDivision;
 	 @ManyToOne
-	  @JoinColumn(name = "staff_id")
-	  private Staff staff;
-	
+	 @JoinColumn(name = "staff_id")
+	private Staff staff;
 }

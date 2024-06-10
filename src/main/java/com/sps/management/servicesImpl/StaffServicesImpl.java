@@ -14,9 +14,12 @@ import com.sps.management.constants.Result;
 import com.sps.management.dtos.NewStaffDTO;
 import com.sps.management.dtos.QualificationDTO;
 import com.sps.management.dtos.ResponseStaffDTO;
+import com.sps.management.dtos.StaffAreaDTO;
 import com.sps.management.models.Qualification;
 import com.sps.management.models.Staff;
+import com.sps.management.models.StaffArea;
 import com.sps.management.repositories.QualificationRepository;
+import com.sps.management.repositories.StaffAreaRepository;
 import com.sps.management.repositories.StaffRepository;
 import com.sps.management.services.StaffServices;
 import com.sps.management.utils.ImageToLocalStorage;
@@ -28,6 +31,8 @@ public class StaffServicesImpl implements StaffServices {
 	private StaffRepository staffRepo;
 	@Autowired
 	private QualificationRepository qualiRepo;
+	@Autowired
+	private StaffAreaRepository areaRepo;
 	@Autowired
 	private ImageToLocalStorage fileService;
 
@@ -50,7 +55,9 @@ public class StaffServicesImpl implements StaffServices {
 
 		Staff staff = createOrUpdateStaff(new Staff(), newStaff);
 		saveOrUpdateQualifications(staff, newStaff.getQuali());
-
+		List <StaffAreaDTO> dto = new ArrayList<>();
+		dto.add( newStaff.getArea());
+		saveOrUpdateStaffArea(staff,dto);
 		return saveStaff(staff);
 	}
 
@@ -79,10 +86,12 @@ public class StaffServicesImpl implements StaffServices {
 		staff.setPaddress(newStaff.getPaddress());
 		staff.setCaddress(newStaff.getCaddress());
 		staff.setEmail(newStaff.getEmail());
-		staff.setStaffImg(fileService.saveImage(newStaff.getStaffImg(), newStaff.getName()));
+		boolean hasImage = newStaff.getStaffImg() != null;
+		staff.setStaffImg(hasImage?fileService.saveImage(newStaff.getStaffImg(), newStaff.getName()):"N/A");
 		staff.setAadharNo(newStaff.getAadharNo());
 		staff.setPanCard(newStaff.getPanCard());
-		staff.setBankDoc(fileService.saveImage(newStaff.getBankDoc(), newStaff.getName() + "BANK"));
+		boolean hasImg = newStaff.getBankDoc() != null;
+		staff.setBankDoc(hasImg?fileService.saveImage(newStaff.getBankDoc(), newStaff.getName() + "BANK"):"N/A");
 		staff.setExEmp(newStaff.getExEmp());
 		staff.setIdCopy(newStaff.getIdCopy());
 		staff.setDeclaration(newStaff.getDeclaration());
@@ -118,6 +127,23 @@ public class StaffServicesImpl implements StaffServices {
 			qualiRepo.save(q);
 		}
 	}
+	
+	private void saveOrUpdateStaffArea(Staff staff, List<StaffAreaDTO> staffAreaDTOs) {
+        List<StaffArea> existingAreas = areaRepo.findByStaff(staff.getStaffId());
+        if (!existingAreas.isEmpty()) {
+            areaRepo.deleteAll(existingAreas);
+        }
+        
+        for (StaffAreaDTO dto : staffAreaDTOs) {
+            StaffArea staffArea = new StaffArea();
+            staffArea.setArea(dto.getArea()); 
+            staffArea.setCircle(dto.getCircle());
+            staffArea.setDivision(dto.getDivision());
+            staffArea.setSubDivision(dto.getSubDivision());
+            staffArea.setStaff(staff);
+            areaRepo.save(staffArea);
+        }
+    }
 
 	private String saveStaff(Staff staff) {
 		Staff savedStaff = staffRepo.save(staff);
@@ -135,6 +161,16 @@ public class StaffServicesImpl implements StaffServices {
 			rsd=null;
 		}
 		return found;
+	}
+	
+	@Override
+	public ResponseStaffDTO staffByID(Long staffId) {
+		Staff staff = staffRepo.findById(staffId).get();
+		if(staff!=null) {
+			ResponseStaffDTO rsd = new ResponseStaffDTO();
+			return rsd=mapForGet(rsd,staff);
+		}
+		return null;
 	}
 
 	public ResponseStaffDTO mapForGet(ResponseStaffDTO rsd, Staff s) {

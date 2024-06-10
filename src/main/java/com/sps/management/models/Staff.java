@@ -9,8 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,6 +39,8 @@ public class Staff {
 	private String staffImg;
 	 @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
 	private List<Qualification> quali;
+	 @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL)
+	private List<StaffArea> area;
 	private String aadharNo;
 	private String panCard;
 	private String bankDoc;

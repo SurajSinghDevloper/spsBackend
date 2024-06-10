@@ -40,14 +40,21 @@ public class StaffController {
     }
     
     @GetMapping("/staff-list/all")
-    public ResponseEntity<List<?>> getAllStaff() {
+    public ResponseEntity<?> getAllStaff() {
         List<ResponseStaffDTO> staffList = staffService.allStaffs();
         return ResponseEntity.ok(staffList);
     }
     
+    @GetMapping("/staff-list/{staffId}")
+    public ResponseEntity<?> getStaff(@PathVariable String staffId) {
+    	Long id = Long.parseLong(decoder(staffId));
+        ResponseStaffDTO staffList = staffService.staffByID(id);
+        return ResponseEntity.ok(staffList);
+    }
+    
+    
     public String decoder(String content) {
     	byte[] decodedBytes = Base64.getDecoder().decode(content);
-        String decoded = new String(decodedBytes, StandardCharsets.UTF_8);
-        return decoded;
+    	return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 }

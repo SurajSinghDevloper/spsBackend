@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
-import com.sps.management.models.Qualification;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,6 +33,7 @@ public class NewStaffDTO {
 	@Nullable
 	private MultipartFile staffImg;
 	private List<QualificationDTO> quali;
+	private StaffAreaDTO area;
 	private String aadharNo;
 	private String panCard;
 	@Nullable
