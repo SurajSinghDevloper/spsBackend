@@ -10,6 +10,7 @@ import com.sps.management.models.Qualification;
 
 public interface QualificationRepository extends JpaRepository<Qualification, Long>{
 
-	@Query(value = "SELECT * FROM qualifications WHERE staff_id = :staffId", nativeQuery = true)
-    List<Qualification> findByStaff(@Param("staffId") Long staffId);
+	@Query(value = "SELECT * FROM qualification WHERE staff_id =:staffId", nativeQuery = true)
+	List<Qualification> findByStaff(@Param("staffId") Long staffId);
+
 }
