@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.sps.management.constants.Result;
 import com.sps.management.models.IDCard;
 import com.sps.management.services.IDCardServices;
 
@@ -34,6 +36,21 @@ public class IDController {
             return ResponseEntity.ok(result);
         } else {
             return ResponseEntity.status(500).body(result);
+        }
+    }
+	
+	@PostMapping("/generateIdOnly/{staffId}/{userId}")
+    public ResponseEntity<String> generateIdOnly(@PathVariable String staffId, @PathVariable String userId) {
+        String result = idService.generateIdOnly(Long.parseLong(decoder(staffId)),Long.parseLong(decoder( userId)));
+        
+        if (Result.SUCCESS.toString().equals(result)) {
+            return ResponseEntity.ok(result);
+        } else if (Result.INVALID_ACTION.toString().equals(result)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        } else if (Result.NOT_FOUND.toString().equals(result)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred");
         }
     }
 	

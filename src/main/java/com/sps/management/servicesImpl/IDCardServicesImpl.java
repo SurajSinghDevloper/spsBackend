@@ -66,6 +66,39 @@ public class IDCardServicesImpl implements IDCardServices{
         }
         return Result.WENT_WRONG.toString();
     }
+    
+    @Override
+    public String generateIdOnly(Long staffId, Long userId) {
+    	  Optional<Staff> optionalStaff = staffRepo.findById(staffId);
+    	  if (optionalStaff.isPresent()) {
+              Staff staff = optionalStaff.get();
+              if(staff.getActive().equals(Status.ACTIVE)&&staff.getVerified().equals(Status.VERIFIED)&&staff.getIsOfferGenrated().equals(Status.TRUE)) {
+            	  IDCard card = new IDCard();
+                  card.setEmpNo(staff.getEmpNo());
+                  card.setName(staff.getName());
+                  card.setPost(staff.getPostOf());
+                  card.setDob(staff.getDob());
+                  card.setFname(staff.getFname());
+                  card.setMobNo(staff.getContactNo());
+                  LocalDate currentDate = LocalDate.now();
+                  card.setGenerationDate(currentDate);
+                  card.setValidUpto(currentDate.plusDays(90).toString());
+                  card.setAddress(staff.getPaddress());
+                  card.setStaffId(staffId);
+                  StaffArea area = areaRepo.findByStaff(staffId).get(0);
+                  card.setAreaId(area.getAreaId());
+                  card.setStatus(Status.ACTIVE);
+                  card.setGeneratedBy(userId);
+                  Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+                  card.setStamp(currentTimestamp);
+
+                  idRepo.save(card);
+                  return Result.SUCCESS.toString();
+              }
+              return Result.INVALID_ACTION.toString();
+    	  }
+    	  return Result.NOT_FOUND.toString();
+    }
 	
     @Override
     public List<IDCard> allActiveCards(){
@@ -77,7 +110,7 @@ public class IDCardServicesImpl implements IDCardServices{
     	return idRepo.findByEmpNo(empNo);
     }
 	
-	//supportive Methods
+
 	
 
 }

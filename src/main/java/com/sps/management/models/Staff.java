@@ -72,6 +72,8 @@ public class Staff {
 	private Status isOfferGenrated;
 	@Enumerated(EnumType.STRING)
 	private Status isIdGenrated;
+	private String offerGenDate;
+	private String offerGenBy;
 	private Long approvBy;
 	private String empNo;
 	private String place;

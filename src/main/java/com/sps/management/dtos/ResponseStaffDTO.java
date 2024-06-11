@@ -61,5 +61,7 @@ public class ResponseStaffDTO {
 	private String idStatus;
 	private String characterDoc;
 	private Long filledBy;
+	private String offerGenDate;
+	private String offerGenBy;
 	private Timestamp stamp;
 }

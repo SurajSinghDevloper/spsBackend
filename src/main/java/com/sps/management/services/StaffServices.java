@@ -11,4 +11,7 @@ public interface StaffServices {
 	public List<ResponseStaffDTO> allStaffs() ;
 	public ResponseStaffDTO staffByID(Long staffId);
 	public List<ResponseStaffDTO> staffByVerifiedStatus();
+	public List<ResponseStaffDTO> staffVerifiedStatus();
+	public String generateOfferLetter(Long staffId, Long userId);
+	public String approveCandidate(Long staffId, Long userId);
 }

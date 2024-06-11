@@ -86,6 +86,47 @@ public class StaffServicesImpl implements StaffServices {
 		return found;
 	}
 	
+	@Override
+	public List<ResponseStaffDTO> staffVerifiedStatus() {
+		List<Staff> staff = staffRepo.findStaffVerifiedStatus();
+		List<ResponseStaffDTO> found =new ArrayList<>();
+		for(Staff s:staff) {
+			ResponseStaffDTO rsd = new ResponseStaffDTO();
+			rsd=mapForGet(rsd,s);
+			found.add(rsd);
+			rsd=null;
+		}
+		return found;
+	}
+	
+	@Override
+	public String generateOfferLetter(Long staffId, Long userId) {
+		Staff s = staffRepo.findById(staffId).get();
+		if(s.getVerified().equals("VERIFIED") && s.getActive().equals("ACTIVE")) {
+			s.setOfferGenBy(userId.toString());
+			s.setIsOfferGenrated(Status.TRUE);
+			long timeInMillis = System.currentTimeMillis();
+			Date now = new Date(timeInMillis);
+			s.setOfferGenDate(now.toString());
+			staffRepo.save(s);
+			return Result.SUCCESS.toString();
+		}
+		return Result.INVALID_ACTION.toString();
+	}
+	
+	
+	
+	@Override
+	public String approveCandidate(Long staffId, Long userId) {
+		Staff s = staffRepo.findById(staffId).get();
+		if(s.getActive().equals("ACTIVE")) {
+			s.setApprovBy(userId);
+			s.setVerified(Status.VERIFIED);
+			staffRepo.save(s);
+			return Result.SUCCESS.toString();
+		}
+		return Result.INVALID_ACTION.toString();
+	}
 	
 	//supportive methods 
 
@@ -143,13 +184,13 @@ public class StaffServicesImpl implements StaffServices {
 		staff.setBranch(newStaff.getBranch());
 		staff.setIfscCode(newStaff.getIfscCode());
 		staff.setApprovBy(Long.parseLong(newStaff.getApprovBy()));
-		if(action=="EDIT") {
+		if(action.equals("EDIT")) {
 			staff.setIsOfferGenrated(newStaff.getIsOfferGenrated());
 			staff.setIsIdGenrated(newStaff.getIsIdGenrated());
 			staff.setVerified(newStaff.getVerified());
 			staff.setIdStatus(newStaff.getIdStatus());
 		}
-		if(action!="EDIT") {
+		if(!action.equals("EDIT")) {
 			staff.setIsOfferGenrated(Status.FALSE);
 			staff.setIsIdGenrated(Status.FALSE);
 			staff.setVerified(Status.UNVERIFIED);
@@ -289,6 +330,8 @@ public class StaffServicesImpl implements StaffServices {
 		rsd.setBankName(s.getBankName());
 		rsd.setBranch(s.getBranch());
 		rsd.setIfscCode(s.getIfscCode());
+		rsd.setOfferGenBy(s.getOfferGenBy());
+		rsd.setOfferGenDate(s.getOfferGenDate());
 		rsd.setApprovBy(s.getApprovBy() != null?s.getApprovBy().toString():"N/A");
 		
 		return rsd;
