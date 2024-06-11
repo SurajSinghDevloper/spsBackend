@@ -58,9 +58,7 @@ public class StaffServicesImpl implements StaffServices {
 		List<ResponseStaffDTO> found =new ArrayList<>();
 		for(Staff s:staff) {
 			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			rsd=mapForGet(rsd,s);
-			found.add(rsd);
-			rsd=null;
+			found.add(mapForGet(rsd,s));
 		}
 		return found;
 	}
@@ -70,7 +68,7 @@ public class StaffServicesImpl implements StaffServices {
 		Staff staff = staffRepo.findById(staffId).get();
 		if(staff!=null) {
 			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			return rsd=mapForGet(rsd,staff);
+			return mapForGet(rsd,staff);
 		}
 		return null;
 	}
@@ -291,7 +289,7 @@ public class StaffServicesImpl implements StaffServices {
 		rsd.setBankName(s.getBankName());
 		rsd.setBranch(s.getBranch());
 		rsd.setIfscCode(s.getIfscCode());
-		rsd.setApprovBy(s.getApprovBy().toString());
+		rsd.setApprovBy(s.getApprovBy() != null?s.getApprovBy().toString():"N/A");
 		
 		return rsd;
 	}
