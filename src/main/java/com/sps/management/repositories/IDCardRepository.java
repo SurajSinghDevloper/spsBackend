@@ -14,4 +14,7 @@ public interface IDCardRepository extends JpaRepository<IDCard, Long> {
 	
 	@Query(value = "SELECT * FROM idcard WHERE emp_no =:emp_no", nativeQuery = true)
 	IDCard findByEmpNo(@Param("emp_no") String emp_no);
+	
+	@Query(value = "SELECT * FROM idcard WHERE status ='INACTIVE'", nativeQuery = true)
+	List<IDCard> findDeactiveCards();
 }

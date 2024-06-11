@@ -16,6 +16,7 @@ import com.sps.management.dtos.NewStaffDTO;
 import com.sps.management.dtos.QualificationDTO;
 import com.sps.management.dtos.ResponseStaffDTO;
 import com.sps.management.dtos.StaffAreaDTO;
+import com.sps.management.models.IDCard;
 import com.sps.management.models.Qualification;
 import com.sps.management.models.Staff;
 import com.sps.management.models.StaffArea;
@@ -336,4 +337,6 @@ public class StaffServicesImpl implements StaffServices {
 		
 		return rsd;
 	}
+
+	
 }

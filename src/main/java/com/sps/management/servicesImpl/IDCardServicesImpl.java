@@ -110,7 +110,10 @@ public class IDCardServicesImpl implements IDCardServices{
     	return idRepo.findByEmpNo(empNo);
     }
 	
-
+    @Override
+    public List<IDCard> getAllUnActiveIDCard(){
+    	return idRepo.findDeactiveCards();
+    }
 	
 
 }

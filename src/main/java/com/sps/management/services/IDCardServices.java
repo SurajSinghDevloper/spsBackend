@@ -12,4 +12,6 @@ public interface IDCardServices {
 	 public List<IDCard> allActiveCards();
 	 
 	 public IDCard findByEmpNo(String empNo);
+	 
+	 public List<IDCard> getAllUnActiveIDCard();
 }

@@ -70,6 +70,11 @@ public class IDController {
         }
     }
 	
+	@GetMapping("/id-inactive")
+    public List<IDCard> getAllInActiveCards() {
+        return idService.getAllUnActiveIDCard();
+    }
+	
 	public String decoder(String content) {
     	byte[] decodedBytes = Base64.getDecoder().decode(content);
     	return new String(decodedBytes, StandardCharsets.UTF_8);

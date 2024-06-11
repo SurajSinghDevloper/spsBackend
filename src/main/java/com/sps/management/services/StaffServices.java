@@ -5,6 +5,7 @@ import java.util.List;
 import com.sps.management.constants.Actions;
 import com.sps.management.dtos.NewStaffDTO;
 import com.sps.management.dtos.ResponseStaffDTO;
+import com.sps.management.models.IDCard;
 
 public interface StaffServices {
 	public String saveStaffDetails(Actions action, Long staffId, NewStaffDTO newStaff);
@@ -14,4 +15,5 @@ public interface StaffServices {
 	public List<ResponseStaffDTO> staffVerifiedStatus();
 	public String generateOfferLetter(Long staffId, Long userId);
 	public String approveCandidate(Long staffId, Long userId);
+	
 }
