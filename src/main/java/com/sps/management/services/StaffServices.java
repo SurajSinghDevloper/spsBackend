@@ -2,6 +2,8 @@ package com.sps.management.services;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.sps.management.constants.Actions;
 import com.sps.management.dtos.NewStaffDTO;
 import com.sps.management.dtos.ResponseStaffDTO;
@@ -15,5 +17,5 @@ public interface StaffServices {
 	public List<ResponseStaffDTO> staffVerifiedStatus();
 	public String generateOfferLetter(Long staffId, Long userId);
 	public String approveCandidate(Long staffId, Long userId);
-	
+	public String fileUpload(Long staffId, String fileOf, MultipartFile file);
 }

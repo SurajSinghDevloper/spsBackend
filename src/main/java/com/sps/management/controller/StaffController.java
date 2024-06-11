@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sps.management.constants.Actions;
 import com.sps.management.constants.Result;
@@ -87,6 +89,27 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred");
+        }
+    }
+    
+    
+    @PostMapping("/{staffId}/upload")
+    public ResponseEntity<String> uploadFile(
+            @PathVariable Long staffId,
+            @RequestParam("fileOf") String fileOf,
+            @RequestParam("file") MultipartFile file) {
+        
+        try {
+            String fileName = staffService.fileUpload(staffId, fileOf, file);
+            if ("N/A".equals(fileName)) {
+                return new ResponseEntity<>("File upload failed: Document already exists or invalid type.", HttpStatus.BAD_REQUEST);
+            } else if (Result.WENT_WRONG.toString().equals(fileName)) {
+                return new ResponseEntity<>("File upload failed: Something went wrong.", HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                return new ResponseEntity<>(fileName, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("File upload failed: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     

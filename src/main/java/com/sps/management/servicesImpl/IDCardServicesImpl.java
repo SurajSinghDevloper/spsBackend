@@ -45,7 +45,7 @@ public class IDCardServicesImpl implements IDCardServices{
                 card.setEmpNo(savedStaff.getEmpNo());
                 card.setName(savedStaff.getName());
                 card.setPost(savedStaff.getPostOf());
-                card.setDob(savedStaff.getDob());
+                card.setDob(savedStaff.getDob().toString());
                 card.setFname(savedStaff.getFname());
                 card.setMobNo(savedStaff.getContactNo());
                 LocalDate currentDate = LocalDate.now();

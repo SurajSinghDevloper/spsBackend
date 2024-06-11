@@ -31,7 +31,7 @@ public class IDCard {
 	 private String empNo;
 	 private String name;
 	 private String post;
-	 private Date dob;
+	 private String dob;
 	 private String fname;
 	 private String mobNo;
 	 private String validUpto;

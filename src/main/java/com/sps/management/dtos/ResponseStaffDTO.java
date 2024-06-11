@@ -23,7 +23,7 @@ public class ResponseStaffDTO {
 	private String postOf;
 	private String name;
 	private String fname;
-	private Date dob;
+	private String dob;
 	private int age;
 	private String gender;
 	private String nationality;

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sps.management.constants.Actions;
 import com.sps.management.constants.Result;
@@ -52,58 +53,58 @@ public class StaffServicesImpl implements StaffServices {
 			return Result.INVALID_ACTION.toString();
 		}
 	}
-	
+
 	@Override
 	public List<ResponseStaffDTO> allStaffs() {
-		List<Staff> staff= staffRepo.findAll();
-		List<ResponseStaffDTO> found =new ArrayList<>();
-		for(Staff s:staff) {
+		List<Staff> staff = staffRepo.findAll();
+		List<ResponseStaffDTO> found = new ArrayList<>();
+		for (Staff s : staff) {
 			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			found.add(mapForGet(rsd,s));
+			found.add(mapForGet(rsd, s));
 		}
 		return found;
 	}
-	
+
 	@Override
 	public ResponseStaffDTO staffByID(Long staffId) {
 		Staff staff = staffRepo.findById(staffId).get();
-		if(staff!=null) {
+		if (staff != null) {
 			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			return mapForGet(rsd,staff);
+			return mapForGet(rsd, staff);
 		}
 		return null;
 	}
-	
+
 	@Override
 	public List<ResponseStaffDTO> staffByVerifiedStatus() {
 		List<Staff> staff = staffRepo.findStaffByVerifiedStatus();
-		List<ResponseStaffDTO> found =new ArrayList<>();
-		for(Staff s:staff) {
+		List<ResponseStaffDTO> found = new ArrayList<>();
+		for (Staff s : staff) {
 			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			rsd=mapForGet(rsd,s);
+			rsd = mapForGet(rsd, s);
 			found.add(rsd);
-			rsd=null;
+			rsd = null;
 		}
 		return found;
 	}
-	
+
 	@Override
 	public List<ResponseStaffDTO> staffVerifiedStatus() {
 		List<Staff> staff = staffRepo.findStaffVerifiedStatus();
-		List<ResponseStaffDTO> found =new ArrayList<>();
-		for(Staff s:staff) {
+		List<ResponseStaffDTO> found = new ArrayList<>();
+		for (Staff s : staff) {
 			ResponseStaffDTO rsd = new ResponseStaffDTO();
-			rsd=mapForGet(rsd,s);
+			rsd = mapForGet(rsd, s);
 			found.add(rsd);
-			rsd=null;
+			rsd = null;
 		}
 		return found;
 	}
-	
+
 	@Override
 	public String generateOfferLetter(Long staffId, Long userId) {
 		Staff s = staffRepo.findById(staffId).get();
-		if(s.getVerified().equals("VERIFIED") && s.getActive().equals("ACTIVE")) {
+		if (s.getVerified().equals("VERIFIED") && s.getActive().equals("ACTIVE")) {
 			s.setOfferGenBy(userId.toString());
 			s.setIsOfferGenrated(Status.TRUE);
 			long timeInMillis = System.currentTimeMillis();
@@ -114,13 +115,11 @@ public class StaffServicesImpl implements StaffServices {
 		}
 		return Result.INVALID_ACTION.toString();
 	}
-	
-	
-	
+
 	@Override
 	public String approveCandidate(Long staffId, Long userId) {
 		Staff s = staffRepo.findById(staffId).get();
-		if(s.getActive().equals("ACTIVE")) {
+		if (s.getActive().equals("ACTIVE")) {
 			s.setApprovBy(userId);
 			s.setVerified(Status.VERIFIED);
 			staffRepo.save(s);
@@ -128,19 +127,89 @@ public class StaffServicesImpl implements StaffServices {
 		}
 		return Result.INVALID_ACTION.toString();
 	}
-	
-	//supportive methods 
+
+	@Override
+	public String fileUpload(Long staffId, String fileOf, MultipartFile file) {
+		Staff staff = staffRepo.findById(staffId).get();
+		String fileName = "";
+
+		switch (fileOf) {
+		case "BANK":
+			if (staff.getBankDoc() != null) {
+				fileService.deleteFile(staff.getBankDoc());
+			}
+			fileName = fileService.saveImage(file, staff.getName() + "BANK");
+			staff.setBankDoc(fileName);
+			break;
+
+		case "AADHAR_BACK":
+			if (staff.getAddharBackDoc() != null) {
+				fileService.deleteFile(staff.getAddharBackDoc());
+			}
+			fileName = fileService.saveImage(file, staff.getName() + "AADHAR_BACK");
+			staff.setAddharBackDoc(fileName);
+			break;
+
+		case "AADHAR_FRONT":
+			if (staff.getAddharFrontDoc() != null) {
+				fileService.deleteFile(staff.getAddharFrontDoc());
+			}
+			fileName = fileService.saveImage(file, staff.getName() + "AADHAR_FRONT");
+			staff.setAddharFrontDoc(fileName);
+			break;
+
+		case "PAN_BACK":
+			if (staff.getPanBackDoc() != null) {
+				fileService.deleteFile(staff.getPanBackDoc());
+			}
+			fileName = fileService.saveImage(file, staff.getName() + "PAN_BACK");
+			staff.setPanBackDoc(fileName);
+			break;
+
+		case "PAN_FRONT":
+			if (staff.getPanFrontDoc() != null) {
+				fileService.deleteFile(staff.getPanFrontDoc());
+			}
+			fileName = fileService.saveImage(file, staff.getName() + "PAN_FRONT");
+			staff.setPanFrontDoc(fileName);
+			break;
+
+		case "CHARACTER":
+			if (staff.getCharacterDoc() != null) {
+				fileService.deleteFile(staff.getCharacterDoc());
+			}
+			fileName = fileService.saveImage(file, staff.getName() + "CHARACTER");
+			staff.setCharacterDoc(fileName);
+			break;
+
+		case "USER_IMG":
+			if (staff.getStaffImg() != null) {
+				fileService.deleteFile(staff.getStaffImg());
+			}
+			fileName = fileService.saveImage(file, staff.getName());
+			staff.setStaffImg(fileName);
+			break;
+
+		default:
+			return Result.WENT_WRONG.toString();
+		}
+
+		staffRepo.save(staff);
+		return fileName;
+	}
+
+	// supportive methods
 
 	private String handleNewStaff(NewStaffDTO newStaff) {
 		if (staffRepo.findByEmailOrContactNo(newStaff.getEmail(), newStaff.getContactNo()) != null) {
 			return Result.ALLREADY_EXISTS.toString();
 		}
 
-		Staff staff = createOrUpdateStaff(new Staff(), newStaff,"NEW");
+		Staff staff = createOrUpdateStaff(new Staff(), newStaff, "NEW");
 		saveOrUpdateQualifications(staff, newStaff.getQuali());
-		List <StaffAreaDTO> dto = new ArrayList<>();
-		dto.add( newStaff.getArea());
-		saveOrUpdateStaffArea(staff,dto);
+		List<StaffAreaDTO> dto = new ArrayList<>();
+		dto.add(newStaff.getArea());
+		saveOrUpdateStaffArea(staff, dto);
 		return saveStaff(staff);
 	}
 
@@ -151,18 +220,18 @@ public class StaffServicesImpl implements StaffServices {
 		}
 
 		Staff existingStaff = optionalStaff.get();
-		existingStaff = createOrUpdateStaff(existingStaff, newStaff,"EDIT");
+		existingStaff = createOrUpdateStaff(existingStaff, newStaff, "EDIT");
 		saveOrUpdateQualifications(existingStaff, newStaff.getQuali());
 
 		return saveStaff(existingStaff);
 	}
 
-	private Staff createOrUpdateStaff(Staff staff, NewStaffDTO newStaff,String action) {
+	private Staff createOrUpdateStaff(Staff staff, NewStaffDTO newStaff, String action) {
 		staff.setPostOf(newStaff.getPostOf());
 		staff.setName(newStaff.getName());
 		staff.setFname(newStaff.getFname());
 		staff.setDob(newStaff.getDob());
-		staff.setAge(newStaff.getAge());
+		staff.setAge(Integer.parseInt(newStaff.getAge()));
 		staff.setGender(newStaff.getGender());
 		staff.setMaritalStatus(newStaff.getMaritalStatus());
 		staff.setContactNo(newStaff.getContactNo());
@@ -178,43 +247,28 @@ public class StaffServicesImpl implements StaffServices {
 		Date now = new Date(timeInMillis);
 		staff.setFilledDate(now);
 		staff.setPlace(newStaff.getPlace());
-		staff.setFilledBy(newStaff.getFilledBy());
+		staff.setFilledBy(Long.parseLong(newStaff.getFilledBy()));
 		staff.setBloodGroup(newStaff.getBloodGroup());
 		staff.setAccountNumber(newStaff.getAccountNumber());
 		staff.setBankName(newStaff.getBankName());
 		staff.setBranch(newStaff.getBranch());
 		staff.setIfscCode(newStaff.getIfscCode());
-		staff.setApprovBy(Long.parseLong(newStaff.getApprovBy()));
-		if(action.equals("EDIT")) {
+		if (action.equals("EDIT")) {
 			staff.setIsOfferGenrated(newStaff.getIsOfferGenrated());
 			staff.setIsIdGenrated(newStaff.getIsIdGenrated());
 			staff.setVerified(newStaff.getVerified());
 			staff.setIdStatus(newStaff.getIdStatus());
 		}
-		if(!action.equals("EDIT")) {
+		if (!action.equals("EDIT")) {
 			staff.setIsOfferGenrated(Status.FALSE);
 			staff.setIsIdGenrated(Status.FALSE);
 			staff.setVerified(Status.UNVERIFIED);
 			staff.setIdStatus(Status.INACTIVE);
 			staff.setEmpNo(idGenerator.getEmpId());
-			
+
 		}
 		staff.setActive(Status.ACTIVE);
 		staff.setStamp(new Timestamp(timeInMillis));
-		boolean hasImage = newStaff.getStaffImg() != null;
-		staff.setStaffImg(hasImage?fileService.saveImage(newStaff.getStaffImg(), newStaff.getName()):newStaff.getStaffImgName());
-		boolean hasImg = newStaff.getBankDoc() != null;
-		staff.setBankDoc(hasImg?fileService.saveImage(newStaff.getBankDoc(), newStaff.getName() + "BANK"):newStaff.getBankDocName());
-		boolean hasCharacter = newStaff.getCharacterDoc() != null;
-		staff.setCharacterDoc(hasCharacter?fileService.saveImage(newStaff.getCharacterDoc(), newStaff.getName() + "CHARACTER"):newStaff.getCharacterDocName());
-		boolean hasPanFront=newStaff.getPanFrontDoc()!=null;
-		staff.setPanFrontDoc(hasPanFront?fileService.saveImage(newStaff.getPanFrontDoc(), newStaff.getName() + "PAN_FRONT"):newStaff.getPanBackDocName());
-		boolean hasPanBack=newStaff.getPanBackDoc()!=null;
-		staff.setPanBackDoc(hasPanBack?fileService.saveImage(newStaff.getPanBackDoc(),  newStaff.getName() + "PAN_BACK"):newStaff.getPanBackDocName());
-		boolean hasAdharFront=newStaff.getAddharFrontDoc()!=null;
-		staff.setAddharFrontDoc(hasAdharFront?fileService.saveImage(newStaff.getAddharFrontDoc(),  newStaff.getName() + "AADHAR_FRONT"):newStaff.getAddharFrontDocName());
-		boolean hasAdharBack=newStaff.getAddharBackDoc()!=null;
-		staff.setAddharBackDoc(hasAdharBack?fileService.saveImage(newStaff.getAddharBackDoc(),  newStaff.getName() + "AADHAR_BACK"):newStaff.getAddharBackDocName());
 
 		return staff;
 	}
@@ -241,30 +295,28 @@ public class StaffServicesImpl implements StaffServices {
 			qualiRepo.save(q);
 		}
 	}
-	
+
 	private void saveOrUpdateStaffArea(Staff staff, List<StaffAreaDTO> staffAreaDTOs) {
-        List<StaffArea> existingAreas = areaRepo.findByStaff(staff.getStaffId());
-        if (!existingAreas.isEmpty()) {
-            areaRepo.deleteAll(existingAreas);
-        }
-        
-        for (StaffAreaDTO dto : staffAreaDTOs) {
-            StaffArea staffArea = new StaffArea();
-            staffArea.setArea(dto.getArea()); 
-            staffArea.setCircle(dto.getCircle());
-            staffArea.setDivision(dto.getDivision());
-            staffArea.setSubDivision(dto.getSubDivision());
-            staffArea.setStaff(staff);
-            areaRepo.save(staffArea);
-        }
-    }
+		List<StaffArea> existingAreas = areaRepo.findByStaff(staff.getStaffId());
+		if (!existingAreas.isEmpty()) {
+			areaRepo.deleteAll(existingAreas);
+		}
+
+		for (StaffAreaDTO dto : staffAreaDTOs) {
+			StaffArea staffArea = new StaffArea();
+			staffArea.setArea(dto.getArea());
+			staffArea.setCircle(dto.getCircle());
+			staffArea.setDivision(dto.getDivision());
+			staffArea.setSubDivision(dto.getSubDivision());
+			staffArea.setStaff(staff);
+			areaRepo.save(staffArea);
+		}
+	}
 
 	private String saveStaff(Staff staff) {
 		Staff savedStaff = staffRepo.save(staff);
 		return (savedStaff != null) ? Result.SUCCESS.toString() : Result.WENT_WRONG.toString();
 	}
-	
-
 
 	public ResponseStaffDTO mapForGet(ResponseStaffDTO rsd, Staff s) {
 		rsd.setPostOf(s.getPostOf());
@@ -289,9 +341,9 @@ public class StaffServicesImpl implements StaffServices {
 		rsd.setPlace(s.getPlace());
 		rsd.setFilledBy(s.getFilledBy());
 		rsd.setStamp(s.getStamp());
-		List<Qualification> quali= qualiRepo.findByStaff(s.getStaffId());
-		List<QualificationDTO>qq = new ArrayList<>();
-		for(Qualification d : quali) {
+		List<Qualification> quali = qualiRepo.findByStaff(s.getStaffId());
+		List<QualificationDTO> qq = new ArrayList<>();
+		for (Qualification d : quali) {
 			QualificationDTO qd = new QualificationDTO();
 			qd.setQualiFication(d.getQualiFication());
 			qd.setYop(d.getYop());
@@ -300,20 +352,20 @@ public class StaffServicesImpl implements StaffServices {
 			qd.setOmartks(d.getOmartks());
 			qd.setPercent(d.getPercent());
 			qq.add(qd);
-			qd=null;
+			qd = null;
 		}
-		List<StaffArea>a = areaRepo.findByStaff(s.getStaffId());
-		List <StaffAreaDTO>sad = new ArrayList<>();
-		for(StaffArea sa:a) {
+		List<StaffArea> a = areaRepo.findByStaff(s.getStaffId());
+		List<StaffAreaDTO> sad = new ArrayList<>();
+		for (StaffArea sa : a) {
 			StaffAreaDTO sd = new StaffAreaDTO();
 			sd.setArea(sa.getArea());
 			sd.setCircle(sa.getCircle());
 			sd.setDivision(sa.getDivision());
 			sd.setSubDivision(sa.getSubDivision());
 			sad.add(sd);
-			sd=null;
+			sd = null;
 		}
-		rsd.setArea(sad.get(0));
+		rsd.setArea(sad.contains(sad)?sad.get(0):null);
 		rsd.setQuali(qq);
 		rsd.setActive(s.getActive().toString());
 		rsd.setVerified(s.getVerified().toString());
@@ -333,10 +385,9 @@ public class StaffServicesImpl implements StaffServices {
 		rsd.setIfscCode(s.getIfscCode());
 		rsd.setOfferGenBy(s.getOfferGenBy());
 		rsd.setOfferGenDate(s.getOfferGenDate());
-		rsd.setApprovBy(s.getApprovBy() != null?s.getApprovBy().toString():"N/A");
-		
+		rsd.setApprovBy(s.getApprovBy() != null ? s.getApprovBy().toString() : "N/A");
+
 		return rsd;
 	}
 
-	
 }
