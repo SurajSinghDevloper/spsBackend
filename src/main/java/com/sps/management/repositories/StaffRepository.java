@@ -15,6 +15,9 @@ public interface StaffRepository extends JpaRepository<Staff, Long>{
 	@Query(value = "SELECT * FROM staff WHERE verified ='UNVERIFIED'", nativeQuery = true)
     List<Staff> findStaffByVerifiedStatus();
 	
+	@Query(value = "SELECT * FROM staff WHERE contact_no =:contact_no", nativeQuery = true)
+    Staff findStaffByContact(@Param("contact_no")String contact_no);
+	
 	@Query(value = "SELECT * FROM staff WHERE verified ='VERIFIED'", nativeQuery = true)
     List<Staff> findStaffVerifiedStatus();
 	

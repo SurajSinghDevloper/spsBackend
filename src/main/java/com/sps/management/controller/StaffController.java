@@ -93,14 +93,26 @@ public class StaffController {
     }
     
     
-    @PostMapping("/{empNo}/upload")
+    @PostMapping("/reject-candidate/{staffId}/{userId}")
+    public ResponseEntity<String> rejectCandidate(@PathVariable String staffId, @PathVariable String userId) {
+        String result = staffService.rejectCandidate(Long.parseLong(decoder(staffId)), Long.parseLong(decoder(userId)));
+        if (Result.SUCCESS.toString().equals(result)) {
+            return ResponseEntity.ok(result);
+        } else if (Result.INVALID_ACTION.toString().equals(result)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred");
+        }
+    }
+    
+    
+    @PostMapping("/upload/file")
     public ResponseEntity<String> uploadFile(
-            @PathVariable String empNo,
-            @RequestParam("fileOf") String fileOf,
+    		@RequestParam("empNo") String empNo,
+    		@RequestParam ("fileOf")String fileOf,
             @RequestParam("file") MultipartFile file) {
-        
         try {
-            String fileName = staffService.fileUpload(decoder(empNo), decoder(fileOf), file);
+            String fileName = staffService.fileUpload(empNo, fileOf, file);
             if ("N/A".equals(fileName)) {
                 return new ResponseEntity<>("File upload failed: Document already exists or invalid type.", HttpStatus.BAD_REQUEST);
             } else if (Result.WENT_WRONG.toString().equals(fileName)) {

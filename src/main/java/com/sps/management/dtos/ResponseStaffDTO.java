@@ -21,6 +21,7 @@ import lombok.Setter;
 @Data
 public class ResponseStaffDTO {
 	private String postOf;
+	private String staffId;
 	private String name;
 	private String fname;
 	private String dob;

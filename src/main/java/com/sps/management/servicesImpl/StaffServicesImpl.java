@@ -104,7 +104,9 @@ public class StaffServicesImpl implements StaffServices {
 	@Override
 	public String generateOfferLetter(Long staffId, Long userId) {
 		Staff s = staffRepo.findById(staffId).get();
-		if (s.getVerified().equals("VERIFIED") && s.getActive().equals("ACTIVE")) {
+		String r1=s.getVerified().toString();
+		String r2=s.getActive().toString();
+		if (r1=="VERIFIED" && r2=="ACTIVE") {
 			s.setOfferGenBy(userId.toString());
 			s.setIsOfferGenrated(Status.TRUE);
 			long timeInMillis = System.currentTimeMillis();
@@ -119,9 +121,23 @@ public class StaffServicesImpl implements StaffServices {
 	@Override
 	public String approveCandidate(Long staffId, Long userId) {
 		Staff s = staffRepo.findById(staffId).get();
-		if (s.getActive().equals("ACTIVE")) {
+		String active = s.getActive().toString();
+		if (active=="ACTIVE") {
 			s.setApprovBy(userId);
 			s.setVerified(Status.VERIFIED);
+			staffRepo.save(s);
+			return Result.SUCCESS.toString();
+		}
+		return Result.INVALID_ACTION.toString();
+	}
+	
+	@Override
+	public String rejectCandidate(Long staffId, Long userId) {
+		Staff s = staffRepo.findById(staffId).get();
+		String active = s.getActive().toString();
+		if (active=="ACTIVE") {
+			s.setApprovBy(userId);
+			s.setVerified(Status.UNVERIFIED);
 			staffRepo.save(s);
 			return Result.SUCCESS.toString();
 		}
@@ -201,7 +217,7 @@ public class StaffServicesImpl implements StaffServices {
 	// supportive methods
 
 	private String handleNewStaff(NewStaffDTO newStaff) {
-		if (staffRepo.findByEmailOrContactNo(newStaff.getEmail(), newStaff.getContactNo()) != null) {
+		if (staffRepo.findStaffByContact(newStaff.getContactNo()) != null) {
 			return Result.ALLREADY_EXISTS.toString();
 		}
 
@@ -209,6 +225,7 @@ public class StaffServicesImpl implements StaffServices {
 		if (staff.getQuali() != null) {
 		    saveOrUpdateQualifications(staff, newStaff.getQuali());
 		} 
+		
 		List<StaffAreaDTO> dto = new ArrayList<>();
 		dto.add(newStaff.getArea());
 		saveOrUpdateStaffArea(staff, dto);
@@ -233,7 +250,7 @@ public class StaffServicesImpl implements StaffServices {
 		staff.setName(newStaff.getName());
 		staff.setFname(newStaff.getFname());
 		staff.setDob(newStaff.getDob());
-		staff.setAge(Integer.parseInt(newStaff.getAge()));
+		staff.setAge(!newStaff.getAge().isEmpty()?Integer.parseInt(newStaff.getAge()):0);
 		staff.setGender(newStaff.getGender());
 		staff.setMaritalStatus(newStaff.getMaritalStatus());
 		staff.setContactNo(newStaff.getContactNo());
@@ -303,6 +320,10 @@ public class StaffServicesImpl implements StaffServices {
 		if (!existingAreas.isEmpty()) {
 			areaRepo.deleteAll(existingAreas);
 		}
+		
+		if (staff.getStaffId() == null) {
+			staff = staffRepo.save(staff);
+		}
 
 		for (StaffAreaDTO dto : staffAreaDTOs) {
 			StaffArea staffArea = new StaffArea();
@@ -322,6 +343,7 @@ public class StaffServicesImpl implements StaffServices {
 
 	public ResponseStaffDTO mapForGet(ResponseStaffDTO rsd, Staff s) {
 		rsd.setPostOf(s.getPostOf());
+		rsd.setStaffId(s.getStaffId().toString());
 		rsd.setName(s.getName());
 		rsd.setFname(s.getFname());
 		rsd.setDob(s.getDob());

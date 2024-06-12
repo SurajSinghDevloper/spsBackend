@@ -59,10 +59,10 @@ public class IDController {
         return idService.allActiveCards();
     }
 	
-	@GetMapping("/{empNo}")
+	@GetMapping("/emp-idcard/{empNo}")
     public ResponseEntity<IDCard> getIDCardByEmpNo(@PathVariable String empNo) {
-		String no = decoder(empNo);
-        IDCard idCard = idService.findByEmpNo(no);
+		
+        IDCard idCard = idService.findByEmpNo(decoder(empNo));
         if (idCard != null) {
             return new ResponseEntity<>(idCard, HttpStatus.OK);
         } else {

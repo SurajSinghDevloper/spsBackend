@@ -17,5 +17,6 @@ public interface StaffServices {
 	public List<ResponseStaffDTO> staffVerifiedStatus();
 	public String generateOfferLetter(Long staffId, Long userId);
 	public String approveCandidate(Long staffId, Long userId);
+	public String rejectCandidate(Long staffId, Long userId);
 	public String fileUpload(String empNo, String fileOf, MultipartFile file);
 }
