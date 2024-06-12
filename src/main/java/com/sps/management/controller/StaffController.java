@@ -93,14 +93,14 @@ public class StaffController {
     }
     
     
-    @PostMapping("/{staffId}/upload")
+    @PostMapping("/{empNo}/upload")
     public ResponseEntity<String> uploadFile(
-            @PathVariable Long staffId,
+            @PathVariable String empNo,
             @RequestParam("fileOf") String fileOf,
             @RequestParam("file") MultipartFile file) {
         
         try {
-            String fileName = staffService.fileUpload(staffId, fileOf, file);
+            String fileName = staffService.fileUpload(decoder(empNo), decoder(fileOf), file);
             if ("N/A".equals(fileName)) {
                 return new ResponseEntity<>("File upload failed: Document already exists or invalid type.", HttpStatus.BAD_REQUEST);
             } else if (Result.WENT_WRONG.toString().equals(fileName)) {

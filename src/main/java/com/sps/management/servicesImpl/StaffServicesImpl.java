@@ -129,8 +129,8 @@ public class StaffServicesImpl implements StaffServices {
 	}
 
 	@Override
-	public String fileUpload(Long staffId, String fileOf, MultipartFile file) {
-		Staff staff = staffRepo.findById(staffId).get();
+	public String fileUpload(String empNo, String fileOf, MultipartFile file) {
+		Staff staff = staffRepo.findByEmpId(empNo);
 		String fileName = "";
 
 		switch (fileOf) {
@@ -206,7 +206,9 @@ public class StaffServicesImpl implements StaffServices {
 		}
 
 		Staff staff = createOrUpdateStaff(new Staff(), newStaff, "NEW");
-		saveOrUpdateQualifications(staff, newStaff.getQuali());
+		if (staff.getQuali() != null) {
+		    saveOrUpdateQualifications(staff, newStaff.getQuali());
+		} 
 		List<StaffAreaDTO> dto = new ArrayList<>();
 		dto.add(newStaff.getArea());
 		saveOrUpdateStaffArea(staff, dto);
@@ -315,7 +317,7 @@ public class StaffServicesImpl implements StaffServices {
 
 	private String saveStaff(Staff staff) {
 		Staff savedStaff = staffRepo.save(staff);
-		return (savedStaff != null) ? Result.SUCCESS.toString() : Result.WENT_WRONG.toString();
+		return (savedStaff != null) ? savedStaff.getEmpNo() : Result.WENT_WRONG.toString();
 	}
 
 	public ResponseStaffDTO mapForGet(ResponseStaffDTO rsd, Staff s) {
