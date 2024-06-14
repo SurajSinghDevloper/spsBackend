@@ -76,6 +76,8 @@ public class Staff {
 	private String offerGenBy;
 	private Long approvBy;
 	private String empNo;
+	private Long sampleId;
+	private String tempEmp;
 	private String place;
 	private Long filledBy;
 	private Timestamp stamp;

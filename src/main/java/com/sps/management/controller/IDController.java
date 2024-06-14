@@ -49,6 +49,8 @@ public class IDController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         } else if (Result.NOT_FOUND.toString().equals(result)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        } else if (Result.ALLREADY_EXISTS.toString().equals(result)) {
+            return ResponseEntity.status(HttpStatus.ALREADY_REPORTED).body(result);
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error occurred");
         }
@@ -60,13 +62,14 @@ public class IDController {
     }
 	
 	@GetMapping("/emp-idcard/{empNo}")
-    public ResponseEntity<IDCard> getIDCardByEmpNo(@PathVariable String empNo) {
+    public ResponseEntity<?> getIDCardByEmpNo(@PathVariable String empNo) {
 		
         IDCard idCard = idService.findByEmpNo(decoder(empNo));
         if (idCard != null) {
             return new ResponseEntity<>(idCard, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        	String result = "NO ACTIVE ID-CARD FOUND";
+            return new ResponseEntity<>(result,HttpStatus.NO_CONTENT);
         }
     }
 	

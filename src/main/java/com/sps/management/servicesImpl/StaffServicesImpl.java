@@ -286,6 +286,9 @@ public class StaffServicesImpl implements StaffServices {
 			staff.setEmpNo(idGenerator.getEmpId());
 
 		}
+		staff.setTempEmp(newStaff.getTempEmp());
+		Staff sc = staffRepo.getLatest();
+		staff.setSampleId((sc==null||sc.getSampleId() == null) ?10001: sc.getSampleId() + 1  );
 		staff.setActive(Status.ACTIVE);
 		staff.setStamp(new Timestamp(timeInMillis));
 
@@ -409,8 +412,8 @@ public class StaffServicesImpl implements StaffServices {
 		rsd.setIfscCode(s.getIfscCode());
 		rsd.setOfferGenBy(s.getOfferGenBy());
 		rsd.setOfferGenDate(s.getOfferGenDate());
+		rsd.setTempEmp(s.getTempEmp());
 		rsd.setApprovBy(s.getApprovBy() != null ? s.getApprovBy().toString() : "N/A");
-
 		return rsd;
 	}
 

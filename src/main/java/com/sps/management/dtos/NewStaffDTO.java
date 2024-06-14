@@ -50,6 +50,7 @@ public class NewStaffDTO {
 	private String filledDate;
 	private String place;
 	private String filledBy;
+	private String tempEmp;
 	private Status isOfferGenrated;
 	private Status isIdGenrated;
 	private Status verified;

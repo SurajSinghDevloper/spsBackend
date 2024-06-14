@@ -23,4 +23,7 @@ public interface StaffRepository extends JpaRepository<Staff, Long>{
 	
 	 @Query(value = "SELECT * FROM staff WHERE emp_no = :emp_no", nativeQuery = true)
 	    Staff findByEmpId(@Param("emp_no") String emp_no);
+	 
+	 @Query(value = "SELECT * FROM staff ORDER BY staff_id DESC LIMIT 1", nativeQuery = true)
+	 Staff getLatest();
 }

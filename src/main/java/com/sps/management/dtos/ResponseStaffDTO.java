@@ -61,6 +61,7 @@ public class ResponseStaffDTO {
 	private String verified;
 	private String idStatus;
 	private String characterDoc;
+	private String tempEmp;
 	private Long filledBy;
 	private String offerGenDate;
 	private String offerGenBy;

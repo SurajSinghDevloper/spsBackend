@@ -26,12 +26,11 @@ public class EmpIdGenerator {
         String year = currentDate.format(yearFormatter);
         String month = currentDate.format(monthFormatter);
 
-        // Generate a random 5-digit number
-        Random random = new Random();
-        int randomNumber = 10000 + random.nextInt(90000); 
+        Staff sc = staffRepo.getLatest();
+        Long prevId = (sc==null||sc.getSampleId() == null) ?10001: sc.getSampleId() + 1 ;
 
         // Concatenate to form the EmpCode
-        String empCode = String.format("SPS-ER/%s%s%05d", year, month, randomNumber);
+        String empCode = String.format("SPS-ER/%s%s%05d", year, month, prevId+1);
 
         return empCode;
     }

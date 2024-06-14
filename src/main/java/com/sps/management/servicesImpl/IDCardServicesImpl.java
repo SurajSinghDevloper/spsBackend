@@ -41,27 +41,32 @@ public class IDCardServicesImpl implements IDCardServices{
             Staff savedStaff = staffRepo.save(staff);
 
             if (savedStaff != null) {
-                IDCard card = new IDCard();
-                card.setEmpNo(savedStaff.getEmpNo());
-                card.setName(savedStaff.getName());
-                card.setPost(savedStaff.getPostOf());
-                card.setDob(savedStaff.getDob().toString());
-                card.setFname(savedStaff.getFname());
-                card.setMobNo(savedStaff.getContactNo());
-                LocalDate currentDate = LocalDate.now();
-                card.setGenerationDate(currentDate);
-                card.setValidUpto(currentDate.plusDays(90).toString());
-                card.setAddress(savedStaff.getPaddress());
-                card.setStaffId(staffId);
-                StaffArea area = areaRepo.findByStaff(staffId).get(0);
-                card.setAreaId(area.getAreaId());
-                card.setStatus(Status.ACTIVE);
-                card.setGeneratedBy(userId);
-                Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-                card.setStamp(currentTimestamp);
+            	Staff s = optionalStaff.get();
+            	IDCard oldCard = idRepo.findByEmpNo(s.getEmpNo());
+            	if(oldCard!=null) {
+            		IDCard card = new IDCard();
+                    card.setEmpNo(savedStaff.getEmpNo());
+                    card.setName(savedStaff.getName());
+                    card.setPost(savedStaff.getPostOf());
+                    card.setDob(savedStaff.getDob().toString());
+                    card.setFname(savedStaff.getFname());
+                    card.setMobNo(savedStaff.getContactNo());
+                    LocalDate currentDate = LocalDate.now();
+                    card.setGenerationDate(currentDate);
+                    card.setValidUpto(currentDate.plusDays(90).toString());
+                    card.setAddress(savedStaff.getPaddress());
+                    card.setStaffId(staffId);
+                    StaffArea area = areaRepo.findByStaff(staffId).get(0);
+                    card.setAreaId(area.getAreaId());
+                    card.setStatus(Status.ACTIVE);
+                    card.setGeneratedBy(userId);
+                    Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+                    card.setStamp(currentTimestamp);
 
-                idRepo.save(card);
-                return Result.SUCCESS.toString();
+                    idRepo.save(card);
+                    return Result.SUCCESS.toString();
+            	}
+                return Result.ALLREADY_EXISTS.toString();
             }
         }
         return Result.WENT_WRONG.toString();
@@ -72,28 +77,37 @@ public class IDCardServicesImpl implements IDCardServices{
     	  Optional<Staff> optionalStaff = staffRepo.findById(staffId);
     	  if (optionalStaff.isPresent()) {
               Staff staff = optionalStaff.get();
+              
               if(staff.getActive().equals(Status.ACTIVE)&&staff.getVerified().equals(Status.VERIFIED)&&staff.getIsOfferGenrated().equals(Status.TRUE)) {
-            	  IDCard card = new IDCard();
-                  card.setEmpNo(staff.getEmpNo());
-                  card.setName(staff.getName());
-                  card.setPost(staff.getPostOf());
-                  card.setDob(staff.getDob());
-                  card.setFname(staff.getFname());
-                  card.setMobNo(staff.getContactNo());
-                  LocalDate currentDate = LocalDate.now();
-                  card.setGenerationDate(currentDate);
-                  card.setValidUpto(currentDate.plusDays(90).toString());
-                  card.setAddress(staff.getPaddress());
-                  card.setStaffId(staffId);
-                  StaffArea area = areaRepo.findByStaff(staffId).get(0);
-                  card.setAreaId(area.getAreaId());
-                  card.setStatus(Status.ACTIVE);
-                  card.setGeneratedBy(userId);
-                  Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-                  card.setStamp(currentTimestamp);
+            	  
+            	  IDCard foundCard = idRepo.findByEmpNo(staff.getEmpNo());
+            	  if(foundCard ==null) {
+            		  IDCard card = new IDCard();
+                      card.setEmpNo(staff.getEmpNo());
+                      card.setName(staff.getName());
+                      card.setPost(staff.getPostOf());
+                      card.setDob(staff.getDob());
+                      card.setFname(staff.getFname());
+                      card.setStaffImg(staff.getStaffImg());
+                      card.setMobNo(staff.getContactNo());
+                      LocalDate currentDate = LocalDate.now();
+                      card.setGenerationDate(currentDate);
+                      card.setValidUpto(currentDate.plusDays(90).toString());
+                      card.setAddress(staff.getPaddress());
+                      card.setTempEmp(staff.getTempEmp());
+                      card.setStaffId(staffId);
+                      StaffArea area = areaRepo.findByStaff(staffId).get(0);
+                      card.setAreaId(area.getAreaId());
+                      card.setStatus(Status.ACTIVE);
+                      card.setGeneratedBy(userId);
+                      Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+                      card.setStamp(currentTimestamp);
 
-                  idRepo.save(card);
-                  return Result.SUCCESS.toString();
+                      idRepo.save(card);
+                      return Result.SUCCESS.toString();
+            	  }
+            	  
+            	  return Result.ALLREADY_EXISTS.toString();
               }
               return Result.INVALID_ACTION.toString();
     	  }
@@ -107,7 +121,8 @@ public class IDCardServicesImpl implements IDCardServices{
     
     @Override
     public IDCard findByEmpNo(String empNo) {
-    	return idRepo.findByEmpNo(empNo);
+    	IDCard foundId = idRepo.findByEmpNo(empNo);
+    	return foundId;
     }
 	
     @Override

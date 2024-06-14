@@ -37,11 +37,13 @@ public class IDCard {
 	 private String validUpto;
 	 private String address;
 	 private LocalDate generationDate;
+	 private String staffImg;
 	 private Long staffId;
 	 private Long areaId;
 	 @Enumerated(EnumType.STRING)
 	 private Status status;
 	 private Long generatedBy;
+	 private String tempEmp;
 	 private Timestamp stamp;
 	 
 	 

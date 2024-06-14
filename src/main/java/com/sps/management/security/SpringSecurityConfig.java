@@ -38,6 +38,7 @@ public class SpringSecurityConfig {
         .cors(cors -> cors.disable())
                 .authorizeHttpRequests((authorize) -> {
                     authorize.requestMatchers("/api/v1/auth/**").permitAll();
+                    authorize.requestMatchers("/api/v1/spsm/**").permitAll();
                     authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     authorize.anyRequest().authenticated();
                 }).httpBasic(Customizer.withDefaults());
